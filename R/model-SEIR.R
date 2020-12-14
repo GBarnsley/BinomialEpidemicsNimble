@@ -118,7 +118,7 @@ initialValues.SEIR <- function(epiModel, hyperParameters){
 #' the NpmDelta sampler to newE and newI.
 #' @param epiModel An object of the SEIR class
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
-#' @return SEIR class with a compiled MCMC
+#' @return a complied MCMC
 #' @export
 buildMCMCInternal.SEIR <- function(epiModel, hyperParameters){
   output <- configureMCMC(epiModel@Model, nodes = NULL)
