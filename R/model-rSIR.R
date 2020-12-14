@@ -34,7 +34,7 @@ initialValues.rSIR <- function(epiModel, hyperParameters){
 #' the NpmDelta sampler to newR.
 #' @param epiModel An object of the rSIR class
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
-#' @return rSIR class with a compiled MCMC
+#' @return a complied MCMC
 #' @export
 buildMCMCInternal.rSIR <- function(epiModel, hyperParameters){
   output <- configureMCMC(epiModel@Model, nodes = NULL)
