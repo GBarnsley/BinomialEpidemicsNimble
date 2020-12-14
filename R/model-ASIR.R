@@ -132,7 +132,7 @@ initialValues.ASIR <- function(epiModel, hyperParameters){
 #' on newI and newUR.
 #' @param epiModel An object of the ASIR class
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
-#' @return ASIR class with a compiled MCMC
+#' @return a complied MCMC
 #' @export
 buildMCMCInternal.ASIR <- function(epiModel, hyperParameters){
   output <- configureMCMC(epiModel@Model, nodes = NULL)
