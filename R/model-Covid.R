@@ -143,18 +143,12 @@ buildMCMCInternal.COVIDUK <- function(epiModel, hyperParameters){
   for(i in 1:nrow(epiModel@Model$newD)){
     output$addSampler(target = paste0("newI[",i,",]"),
                       type = sampler,
-                      control = list(
-                        TMax = 20,
-                        DeltaMax = 50,
-                        R = 10
-                      ))
+                      control = hyperParameters$`N+-Delta`
+                      )
     output$addSampler(target = paste0("newR[",i,",]"),
                       type = sampler,
-                      control = list(
-                        TMax = 20,
-                        DeltaMax = 25,
-                        R = 5
-                      ))
+                      control = hyperParameters$`N+-Delta`
+                      )
   }
   output$addSampler(target = "Alpha",
                     type = "RW")
