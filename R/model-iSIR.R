@@ -34,7 +34,7 @@ initialValues.iSIR <- function(epiModel, hyperParameters){
 #' the NpmDelta sampler to newI
 #' @param epiModel An object of the iSIR class
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
-#' @return iSIR class with a compiled MCMC
+#' @return a complied MCMC
 #' @export
 buildMCMCInternal.iSIR <- function(epiModel, hyperParameters){
   if(!is.null(hyperParameters$newI$Bounded)){
