@@ -1,6 +1,8 @@
 # BinomialEpidemicsNimble
 A framework for fitting Binomial Epidemic Models with MCMCs in Nimble
 
+**  NOT FINISHED OR FIT FOR USE **
+
 An extension of my masters disseration, developing a frame work for applying Bayesian Data Augmention to Binomial Epidemic Models.
 
 Most of this package is wrappers for Nimble code that sets up a model, assigns samplers and then run an MCMC to simulate parameter inference.
