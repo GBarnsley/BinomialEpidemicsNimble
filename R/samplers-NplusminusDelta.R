@@ -118,7 +118,6 @@ stepSampler_run <- function() {
 #' annotated in the code.
 #' @export
 stepSampler_run_bounded <- function() {
-  model_lp_initial <- getLogProb(model, calcNodes)
   pointsToMove <- model[[target]]!=0
   canMoveBackward <- rep(TRUE, length(model[[target]]))
   canMoveBackward[1] <- FALSE
@@ -184,9 +183,15 @@ stepSampler_run_bounded <- function() {
     #some of these are easier to find when we haven't updated the values
     positionsRev <- length(positions) + (model[[target]][newPosition] == 0) - (amount == model[[target]][position])
     
+    if(direction == 1){
+      calcIndex <- position
+    }else{
+      calcIndex <- newPosition
+    }
+    model_lp_initial <- getLogProb(model, calcNodes)
     model[[target]][position] <<- model[[target]][position] - amount
     model[[target]][newPosition] <<- model[[target]][newPosition] + amount
-    model_lp_proposed <- calculate(model, calcNodes)
+    model_lp_proposed <- calculate(model, calcNodes[[calcIndex]])
     
     #Calculating the rest of the values for the reverse probability
     if(newPosition == length(model[[target]])){
