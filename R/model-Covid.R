@@ -116,6 +116,7 @@ initialValues.COVIDUK <- function(epiModel, hyperParameters){
   epiModel@Model$LockdownRate <- hyperParameters$Priors$Lockdown$Rate
   epiModel@Model$LockdownShape <- hyperParameters$Priors$Lockdown$Shape
   #generating initial newI and newR
+  newD <- epiModel@Model$newD
   newR <- round(newD*hyperParameters$Priors$ProportionUndetected)
   #storing first row of dections/removals
   firstRow <- newD[,1] + newR[,1]
