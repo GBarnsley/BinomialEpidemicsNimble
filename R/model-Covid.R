@@ -54,7 +54,6 @@ COVIDModel <- function(newD,
       }
     }
   })
-  hiddenInfections <- TotalInfections - sum(newR)
   return(COVIDUKclass(
     Model = compileNimble(
       nimbleModel(
@@ -76,8 +75,8 @@ COVIDModel <- function(newD,
                     AlphaShape = 1,
                     BetaRate = 1,
                     BetaShape = 1,
-                    LockdownRate = 1,
-                    LockdownShape = 1
+                    LockdownRate = c(1,1),
+                    LockdownShape = c(1,1)
         ),
         inits = list(Beta = 1,
                      Gamma = 1,
@@ -117,7 +116,7 @@ initialValues.COVIDUK <- function(epiModel, hyperParameters){
   epiModel@Model$LockdownRate <- hyperParameters$Priors$Lockdown$Rate
   epiModel@Model$LockdownShape <- hyperParameters$Priors$Lockdown$Shape
   #generating initial newI and newR
-  epiModel@Model$newR <- round(newD*hyperParameters$Priors$ProportionUndetected)
+  newR <- round(newD*hyperParameters$Priors$ProportionUndetected)
   #storing first row of dections/removals
   firstRow <- newD[,1] + newR[,1]
   #setting newI as timeseries of detections/removals without first row
@@ -126,6 +125,7 @@ initialValues.COVIDUK <- function(epiModel, hyperParameters){
   newI[,1] <- newI[,1] + firstRow
   #removing an infection from start region since we assume it begins with an already exiting infection
   newI[epiModel@Model$StartRegion,newI[epiModel@Model$StartRegion,]!=0][1] <- newI[epiModel@Model$StartRegion,newI[epiModel@Model$StartRegion,]!=0][1] - 1
+  epiModel@Model$newR <- newR
   epiModel@Model$newI <- newI
   return(
     epiModel
@@ -179,11 +179,11 @@ buildMCMCInternal.COVIDUK <- function(epiModel, hyperParameters){
 ImportCOVIDUKTimeSeries <- function(population,
                                     positions,
                                     StartRegion = "E12000001",
-                                    Lockdown1Date = dmy("23/03/2020"),
-                                    Lockdown2Date = dmy("13/05/2020"),
-                                    Lockdown1Date1 = dmy("01/11/2020"),#CHECK THIS!
-                                    Lockdown2Date2 = dmy("01/12/2020"),#CHECK THIS!
-                                    VaccinationStartDate = dmy("08/12/2020"),
+                                    Lockdown1Date = lubridate::dmy("23/03/2020"),
+                                    Lockdown2Date = lubridate::dmy("13/05/2020"),
+                                    Lockdown1Date2 = lubridate::dmy("01/11/2020"),#CHECK THIS!
+                                    Lockdown2Date2 = lubridate::dmy("01/12/2020"),#CHECK THIS!
+                                    VaccinationStartDate = lubridate::dmy("08/12/2020"),
                                     startDate = lubridate::dmy("20/01/20")){
   ###Loading Case Data
   ##Loading England Region Cases:
@@ -217,7 +217,7 @@ ImportCOVIDUKTimeSeries <- function(population,
   #standardising
   Connectivity <- Connectivity*(1/max(Connectivity))
   #inverting
-  Connectivity <- 1/Connectivity
+  Connectivity <- 1-Connectivity
   ###Setting up population counts
   ##just put populations in correct order
   pop <- rep(NA, Regions)
@@ -232,14 +232,14 @@ ImportCOVIDUKTimeSeries <- function(population,
   TestCapacity <- c(seq(0,RawTestCapacity$test[which.min(RawTestCapacity$date)],length.out=min(RawTestCapacity$date)-startDate),
                     rev(RawTestCapacity$test))
   ###Setting up ChangePoints
-  ChangePoint <- sort(Lockdown1Date, Lockdown2Date, Lockdown3Date, Lockdown2Date2) - startDate
+  ChangePoint <- c(Lockdown1Date, Lockdown2Date, Lockdown1Date2, Lockdown2Date2) - startDate
   ###Setting up StartRegion
   StartRegion <- which(regionCodes == StartRegion)
   ###Determining TimePeriod
-  TimePeriod <- min(c(CasesMaxDate,TestMaxDate,VaccinationStartDate))
+  TimePeriod <- min(c(CasesMaxDate,TestMaxDate,VaccinationStartDate)) -startDate
   ##Trimming timeseries
   newD <- newD[,1:TimePeriod]
-  TestCapacity <- TestCapacity[,1:TimePeriod]
+  TestCapacity <- TestCapacity[1:TimePeriod]
   ###Setting up the output lists
   Output <- list(
     newD = newD,
