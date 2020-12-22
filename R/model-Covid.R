@@ -42,11 +42,11 @@ COVIDModel <- function(newD,
       for (t in 1:TimePeriod){
         newI[region,t] ~ dbinom(size = S[region,t],
                                 prob =  probGen(
-                                  (sum(connectivity[region,1:Regions]*I[1:Regions,t]))*
+                                  sum(connectivity[region,1:Regions]*I[1:Regions,t]/((Pop)^Frequency))*
                                     Beta*
                                     Lockdown[1]^((t>=ChangePoint[1] & t<ChangePoint[2])|(t>=ChangePoint[3] & t<ChangePoint[4]))*
                                     Lockdown[2]^((t>=ChangePoint[2] & t<ChangePoint[3])|t>=ChangePoint[4])*
-                                    t.step/(Pop[region]^Frequency)))
+                                    t.step))
         newD[region,t] ~ dbinom(size = I[region,t], prob = probGen(Alpha*t.step*TestCapacity[t]))
         newR[region,t] ~ dbinom(size = I[region,t] - newD[region,t], prob = probGen(Gamma*t.step))
         S[region,t+1] <- S[region,t] - newI[region,t]
