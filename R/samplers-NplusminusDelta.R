@@ -5,7 +5,7 @@
 stepSampler_setup <- function(model, mvSaved, target, control) {
   maxStep <- as.integer(control$TMax)
   maxChange <- as.integer(control$DeltaMax)
-  runs <- as.integer(control$R)
+  runs <- control$R
   #getting dependant nodes
   calcNodes <- model$getDependencies(target)
   targetLength <- as.integer(length(model[[target]]))
