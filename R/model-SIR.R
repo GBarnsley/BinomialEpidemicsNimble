@@ -152,6 +152,7 @@ SIR <- function(newI = NULL,
 #' Builds the MCMC for the SIR model. Applies a block-RWM to Beta and Gamma.
 #' @param epiModel An object of the SIR class
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
+#' @param showCompilerOutput Whether compileNimble should prince the compiler output
 #' @return a complied MCMC
 #' @export
 buildMCMCInternal.SIR <- function(epiModel, hyperParameters, showCompilerOutput){
@@ -172,7 +173,6 @@ buildMCMCInternal.SIR <- function(epiModel, hyperParameters, showCompilerOutput)
 #' values.
 #' @param epiModel An object of the SIR class
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
-#' @param showCompilerOutput Whether compileNimble should prince the compiler output
 #' @return SIR class object with the initial values
 #' @export
 initialValues.SIR <- function(epiModel, hyperParameters){
