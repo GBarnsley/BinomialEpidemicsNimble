@@ -15,7 +15,7 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
 #' Runs the NpmDelta algorithm, steps are annotated in the code.
 #' @export
 stepSampler_run <- function() {
-  model_lp_initial <-calculate(model, calcNodes)
+  model_lp_initial <- getLogProb(model, calcNodes)
   positions <- which(model[[target]]!=0)
   for(i in 1:runs){
     #Choose the original position
@@ -108,7 +108,7 @@ stepSampler_run <- function() {
 #' annotated in the code.
 #' @export
 stepSampler_run_bounded <- function() {
-  model_lp_initial <-calculate(model, calcNodes)
+  model_lp_initial <- getLogProb(model, calcNodes)
   pointsToMove <- model[[target]]!=0
   canMoveBackward <- rep(TRUE, length(model[[target]]))
   canMoveBackward[1] <- FALSE
