@@ -37,7 +37,7 @@ initialValues.iSIR <- function(epiModel, hyperParameters){
 #' @param showCompilerOutput Whether compileNimble should prince the compiler output
 #' @return a complied MCMC
 #' @export
-buildMCMCInternal.iSIR <- function(epiModel, hyperParameters){
+buildMCMCInternal.iSIR <- function(epiModel, hyperParameters, showCompilerOutput){
   if(!is.null(hyperParameters$newI$Bounded)){
     if(hyperParameters$newI$Bounded){
       sampler <- nimbleFunction(
@@ -60,6 +60,6 @@ buildMCMCInternal.iSIR <- function(epiModel, hyperParameters){
   output <- buildMCMC(
     output
   )
-  output <- compileNimble(output, project = epiModel@Model, resetFunctions = TRUE)
+  output <- compileNimble(output, project = epiModel@Model, resetFunctions = TRUE, showCompilerOutput = showCompilerOutput)
   return(output)
 }
