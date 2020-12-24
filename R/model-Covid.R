@@ -57,7 +57,7 @@ COVIDModel <- function(newD,
   if(!Frequency){
     Freq <- 1
   }else{
-    Freq <- 1/N
+    Freq <- 1/Pop
   }
   return(COVIDUKclass(
     Model = compileNimble(
