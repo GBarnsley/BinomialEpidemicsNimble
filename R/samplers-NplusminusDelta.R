@@ -18,6 +18,7 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
     nodeNames[i] <- paste0(target,"[",as.character(i),"]")
     calcNodes[[as.character(i)]] <- model$getDependencies(paste0(target,"[",i,":",length(model[[target]]),"]"))
   }
+  print(nodeNames)
   #This method requires two posterior calculations for each repeat but involves 
   #less calculations than calculating every node but only once per repeat (+1),
   #up to the point where the number of calculations (nodes) > 10^3 and the number
