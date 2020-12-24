@@ -75,9 +75,11 @@ stepSampler_run <- function() {
       )
     
     if(direction == 1){
-      CurrentCalcNodes <- calcNodes[[nodeNames[position]]]
+      #CurrentCalcNodes <- calcNodes[[nodeNames[position]]]
+      CurrentCalcNodes <- getDependencies(model, paste0(target,"[",position,"]"))
     }else{
-      CurrentCalcNodes <- calcNodes[[nodeNames[newPosition]]]
+      #CurrentCalcNodes <- calcNodes[[nodeNames[newPosition]]]
+      CurrentCalcNodes <- getDependencies(model, paste0(target,"[",newPosition,"]"))
     }
     
     model_lp_initial <- getLogProb(model, CurrentCalcNodes)
