@@ -9,7 +9,7 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
   #changes before time t 
   calcNodesRaw <- list()
   for(i in 1:length(model[[target]])){
-    calcNodesRaw[[i]] <- nimbleType(name=str(i),type=character, dim = 1)
+    calcNodesRaw[[i]] <- nimbleType(name=as.character(i),type=character, dim = 1)
   }
   calcNodes <- nimbleList(calcNodesRaw)
   for(i in 1:length(model[[target]])){
