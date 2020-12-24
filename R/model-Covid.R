@@ -63,7 +63,8 @@ COVIDModel <- function(newD,
                          Regions = nrow(newD),
                          t.step = t.step,
                          Connectivity = Connectivity,
-                         Pop = Pop
+                         Pop = Pop,
+                         Frequency = Frequency
                          ),
         data = list(newD = newD,
                     StartRegion = StartRegion,
