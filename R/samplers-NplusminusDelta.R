@@ -9,11 +9,18 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
   #changes before time t 
   calcNodesRaw <- list()
   for(i in 1:length(model[[target]])){
-    calcNodesRaw[[i]] <- nimbleType(name=as.character(i),type=character, dim = 1)
+    calcNodesRaw[[i]] <- nimbleType(name=as.character(i),type="character", dim = 1)
   }
   calcNodes <- nimbleList(calcNodesRaw)
+  calcNodes <- calcNodes$new()
   for(i in 1:length(model[[target]])){
-    calcNodes[[i]] <- model$getDependencies(paste0(target,"[",i,"]"))
+    allNodes <- model$getDependencies(paste0(target,"[",i,":",length(model[[target]]),"]"))
+    if(i != length(model[[target]])){
+      specificNodes <- setdiff(allNodes, model$getDependencies(paste0(target,"[",i + 1,":",length(model[[target]]),"]")))
+    }else{
+      specificNodes <- allNodes
+    }
+    calcNodes[[as.character(i)]] <- specificNodes
   }
   #This method requires two posterior calculations for each repeat but involves 
   #less calculations than calculating every node but only once per repeat (+1),
@@ -71,11 +78,11 @@ stepSampler_run <- function() {
          log(length(directions))
       )
     if(direction == 1){
-      calcIndex <- position
+      calcIndex <- as.character(position)
     }else{
-      calcIndex <- newPosition
+      calcIndex <- as.character(newPosition)
     }
-    model_lp_initial <- getLogProb(model, calcNodes)
+    model_lp_initial <- getLogProb(model, calcNodes[[calcIndex]])
     model[[target]][position] <<- model[[target]][position] - amount
     model[[target]][newPosition] <<- model[[target]][newPosition] + amount
     model_lp_proposed <- calculate(model, calcNodes[[calcIndex]])
@@ -188,11 +195,11 @@ stepSampler_run_bounded <- function() {
     positionsRev <- length(positions) + (model[[target]][newPosition] == 0) - (amount == model[[target]][position])
     
     if(direction == 1){
-      calcIndex <- position
+      calcIndex <- as.character(position)
     }else{
-      calcIndex <- newPosition
+      calcIndex <- as.character(newPosition)
     }
-    model_lp_initial <- getLogProb(model, calcNodes)
+    model_lp_initial <- getLogProb(model, calcNodes[[calcIndex]])
     model[[target]][position] <<- model[[target]][position] - amount
     model[[target]][newPosition] <<- model[[target]][newPosition] + amount
     model_lp_proposed <- calculate(model, calcNodes[[calcIndex]])
