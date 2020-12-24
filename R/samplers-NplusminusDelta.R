@@ -75,11 +75,16 @@ stepSampler_run <- function() {
          log(length(directions))
       )
     
+    if(direction == 1){
+      calcIndex <- position
+    }else{
+      calcIndex <- newPosition
+    }
     
-    model_lp_initial <- model$calculate(target[(position*(direction==1) + newPosition*(direction==-1)):length(model[[target]])])
+    model_lp_initial <- model$calculate(target[calcIndex:length(model[[target]])])
     model[[target]][position] <<- model[[target]][position] - amount
     model[[target]][newPosition] <<- model[[target]][newPosition] + amount
-    model_lp_proposed <- model$calculate(target[(position*(direction==1) + newPosition*(direction==-1)):length(model[[target]])])
+    model_lp_proposed <- model$calculate(calcIndex:length(model[[target]])])
     
     #if(direction == 1){
     #  CurrentCalcNodes <- calcNodes[[nodeNames[position]]]
