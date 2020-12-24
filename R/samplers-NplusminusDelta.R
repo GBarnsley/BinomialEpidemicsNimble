@@ -23,12 +23,12 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
   #up to the point where the number of calculations (nodes) > 10^3 and the number
   #of repeats >10^3
   runs <- as.integer(control$R)
+  calcIndex <- "1"
 }
 #' A function used internally in the NpmDelta Sampler.
 #' Runs the NpmDelta algorithm, steps are annotated in the code.
 #' @export
 stepSampler_run <- function() {
-  calcIndex <- "1"
   positions <- which(model[[target]]!=0)
   for(i in 1:runs){
     #Choose the original position
@@ -128,7 +128,6 @@ stepSampler_run <- function() {
 #' annotated in the code.
 #' @export
 stepSampler_run_bounded <- function() {
-  calcIndex <- "1"
   pointsToMove <- model[[target]]!=0
   canMoveBackward <- rep(TRUE, length(model[[target]]))
   canMoveBackward[1] <- FALSE
