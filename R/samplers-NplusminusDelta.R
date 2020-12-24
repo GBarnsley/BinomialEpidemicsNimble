@@ -75,16 +75,22 @@ stepSampler_run <- function() {
          log(length(directions))
       )
     
-    if(direction == 1){
-      CurrentCalcNodes <- calcNodes[[nodeNames[position]]]
-    }else{
-      CurrentCalcNodes <- calcNodes[[nodeNames[newPosition]]]
-    }
     
-    model_lp_initial <- getLogProb(model, CurrentCalcNodes)
+    model_lp_initial <- model$calculate(target[(position*(direction==1) + newPosition*(direction==-1)):length(model[[target]])])
     model[[target]][position] <<- model[[target]][position] - amount
     model[[target]][newPosition] <<- model[[target]][newPosition] + amount
-    model_lp_proposed <- calculate(model, CurrentCalcNodes)
+    model_lp_proposed <- model$calculate(target[(position*(direction==1) + newPosition*(direction==-1)):length(model[[target]])])
+    
+    #if(direction == 1){
+    #  CurrentCalcNodes <- calcNodes[[nodeNames[position]]]
+    #}else{
+    #  CurrentCalcNodes <- calcNodes[[nodeNames[newPosition]]]
+    #}
+    
+    #model_lp_initial <-calculate(model, CurrentCalcNodes)
+    #model[[target]][position] <<- model[[target]][position] - amount
+    #model[[target]][newPosition] <<- model[[target]][newPosition] + amount
+    #model_lp_proposed <- calculate(model, CurrentCalcNodes)
     
     sampler_lp_initial <-
       (-
@@ -107,7 +113,6 @@ stepSampler_run <- function() {
     
     u <- runif(1, 0, 1)
     if(u < exp(log_MH_ratio)){
-      model_lp_initial <- model_lp_proposed
       positions <- which(model[[target]]!=0)
       jump <- TRUE
     }else{
@@ -257,7 +262,6 @@ stepSampler_run_bounded <- function() {
     
     u <- runif(1, 0, 1)
     if(u < exp(log_MH_ratio)){
-      model_lp_initial <- model_lp_proposed
       pointsToMove <- model[[target]]!=0
       for(i in 1:(length(model[[target]])-1)){
         canMoveForward[i] <- model[["I"]][i+1] > 1
