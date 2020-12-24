@@ -13,7 +13,9 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
   }
   calcNodes <- nimbleList(calcNodesRaw)
   calcNodes <- calcNodes$new()
+  nodeNames <- c()
   for(i in 1:length(model[[target]])){
+    nodeNames[i] <- as.character(i)
     allNodes <- model$getDependencies(paste0(target,"[",i,":",length(model[[target]]),"]"))
     if(i != length(model[[target]])){
       specificNodes <- setdiff(allNodes, model$getDependencies(paste0(target,"[",i + 1,":",length(model[[target]]),"]")))
@@ -77,10 +79,11 @@ stepSampler_run <- function() {
          #choosing direction
          log(length(directions))
       )
+    
     if(direction == 1){
-      calcIndex <- as.character(position)
+      calcIndex <- nodeNames(position)
     }else{
-      calcIndex <- as.character(newPosition)
+      calcIndex <- nodeNames(newPosition)
     }
     model_lp_initial <- getLogProb(model, calcNodes[[calcIndex]])
     model[[target]][position] <<- model[[target]][position] - amount
@@ -195,9 +198,9 @@ stepSampler_run_bounded <- function() {
     positionsRev <- length(positions) + (model[[target]][newPosition] == 0) - (amount == model[[target]][position])
     
     if(direction == 1){
-      calcIndex <- as.character(position)
+      calcIndex <- nodeNames(position)
     }else{
-      calcIndex <- as.character(newPosition)
+      calcIndex <- nodeNames(newPosition)
     }
     model_lp_initial <- getLogProb(model, calcNodes[[calcIndex]])
     model[[target]][position] <<- model[[target]][position] - amount
