@@ -16,13 +16,7 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
   nodeNames <- c()
   for(i in 1:length(model[[target]])){
     nodeNames[i] <- as.character(i)
-    allNodes <- model$getDependencies(paste0(target,"[",i,":",length(model[[target]]),"]"))
-    if(i != length(model[[target]])){
-      specificNodes <- setdiff(allNodes, model$getDependencies(paste0(target,"[",i + 1,":",length(model[[target]]),"]")))
-    }else{
-      specificNodes <- allNodes
-    }
-    calcNodes[[as.character(i)]] <- specificNodes
+    calcNodes[[as.character(i)]] <- model$getDependencies(paste0(target,"[",i,":",length(model[[target]]),"]"))
   }
   #This method requires two posterior calculations for each repeat but involves 
   #less calculations than calculating every node but only once per repeat (+1),
