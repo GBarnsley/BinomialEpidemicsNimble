@@ -11,21 +11,10 @@ initialValues.iSIR <- function(epiModel, hyperParameters){
   epiModel@Model$BetaRate <- hyperParameters$Priors$Beta$Rate
   epiModel@Model$GammaShape <- hyperParameters$Priors$Gamma$Shape
   epiModel@Model$GammaRate <- hyperParameters$Priors$Gamma$Rate
-  epiModel@Model$newI <- rep(0, length(epiModel@Model$newR))
-  epiModel@Model$newI[1] <- sum(epiModel@Model$newR) - 1
-  mcmc <- configureMCMC(epiModel@Model, nodes = NULL)
-  mcmc$addSampler(target = "newI",
-                  type = sampler,
-                  control = list(
-                    TMax = 20,
-                    DeltaMax = 20,
-                    R = hyperParameters$`Initial Values`$Runs
-                  ))
-  mcmc <- buildMCMC(
-    mcmc
-  )
-  mcmc <- compileNimble(mcmc, project = epiModel@Model, resetFunctions = TRUE)
-  mcmc$run(1)
+  #initial Censored values
+  first <- epiModel@Model$newR[1]
+  epiModel@Model$newI <- c(epiModel@Model$newR[-1],0)
+  epiModel@Model$newI[1] <- epiModel@Model$newI[1] + first
   return(
     epiModel
   )
