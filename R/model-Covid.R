@@ -137,6 +137,7 @@ initialValues.COVIDUK <- function(epiModel, hyperParameters){
 #' on every region for newI and newR.
 #' @param epiModel An object of the COVIDUK class
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
+#' @param showCompilerOutput Whether compileNimble should prince the compiler output
 #' @return a complied MCMC
 #' @export
 buildMCMCInternal.COVIDUK <- function(epiModel, hyperParameters, showCompilerOutput){
