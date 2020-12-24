@@ -75,9 +75,9 @@ stepSampler_run <- function() {
       )
     
     if(direction == 1){
-      calcIndex <- nodeNames(position)
+      calcIndex <- nodeNames[position]
     }else{
-      calcIndex <- nodeNames(newPosition)
+      calcIndex <- nodeNames[newPosition]
     }
     model_lp_initial <- getLogProb(model, calcNodes[[calcIndex]])
     model[[target]][position] <<- model[[target]][position] - amount
@@ -192,10 +192,11 @@ stepSampler_run_bounded <- function() {
     positionsRev <- length(positions) + (model[[target]][newPosition] == 0) - (amount == model[[target]][position])
     
     if(direction == 1){
-      calcIndex <- nodeNames(position)
+      calcIndex <- nodeNames[position]
     }else{
-      calcIndex <- nodeNames(newPosition)
+      calcIndex <- nodeNames[newPosition]
     }
+    
     model_lp_initial <- getLogProb(model, calcNodes[[calcIndex]])
     model[[target]][position] <<- model[[target]][position] - amount
     model[[target]][newPosition] <<- model[[target]][newPosition] + amount
