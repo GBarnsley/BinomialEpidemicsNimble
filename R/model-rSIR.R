@@ -34,9 +34,10 @@ initialValues.rSIR <- function(epiModel, hyperParameters){
 #' the NpmDelta sampler to newR.
 #' @param epiModel An object of the rSIR class
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
+#' @param showCompilerOutput Whether compileNimble should prince the compiler output
 #' @return a complied MCMC
 #' @export
-buildMCMCInternal.rSIR <- function(epiModel, hyperParameters){
+buildMCMCInternal.rSIR <- function(epiModel, hyperParameters, showCompilerOutput){
   output <- configureMCMC(epiModel@Model, nodes = NULL)
   output$addSampler(target = c('Beta', 'Gamma'),
                     type = sampler_RW_block,
@@ -48,6 +49,6 @@ buildMCMCInternal.rSIR <- function(epiModel, hyperParameters){
   output <- buildMCMC(
     output
   )
-  output <- compileNimble(output, project = epiModel@Model, resetFunctions = TRUE)
+  output <- compileNimble(output, project = epiModel@Model, resetFunctions = TRUE, showCompilerOutput = showCompilerOutput)
   return(output)
 }
