@@ -154,7 +154,7 @@ SIR <- function(newI = NULL,
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
 #' @return a complied MCMC
 #' @export
-buildMCMCInternal.SIR <- function(epiModel, hyperParameters){
+buildMCMCInternal.SIR <- function(epiModel, hyperParameters, showCompilerOutput){
   output <- configureMCMC(epiModel@Model, nodes = NULL)
   output$addSampler(target = c('Beta', 'Gamma'),
                     type = sampler_RW_block,
@@ -164,7 +164,8 @@ buildMCMCInternal.SIR <- function(epiModel, hyperParameters){
       output
     ),
     project = epiModel@Model,
-    resetFunctions = TRUE
+    resetFunctions = TRUE,
+    showCompilerOutput = showCompilerOutput
   ))
 }
 #' Method to initialize the SIR model, sets Beta/Gamma by their given initial
