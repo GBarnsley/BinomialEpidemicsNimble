@@ -5,20 +5,8 @@
 stepSampler_setup <- function(model, mvSaved, target, control) {
   maxStep <- as.integer(control$TMax)
   maxChange <- as.integer(control$DeltaMax)
-  #Lists calc nodes for each time point, since change after time t don't effect 
-  #changes before time t 
-  calcNodesRaw <- list()
-  for(i in 1:length(model[[target]])){
-    calcNodesRaw[[i]] <- nimbleType(name=as.character(i),type="character", dim = 1)
-  }
-  calcNodes <- nimbleList(calcNodesRaw)
-  calcNodes <- calcNodes$new()
-  nodeNames <- c()
-  for(i in 1:length(model[[target]])){
-    nodeNames[i] <- paste0(target,"[",as.character(i),"]")
-    calcNodes[[as.character(i)]] <- model$getDependencies(paste0(target,"[",i,":",length(model[[target]]),"]"))
-  }
-  print(nodeNames)
+  #getting dependant nodes
+  calcNodes <- model$getDependencies(target)
   #This method requires two posterior calculations for each repeat but involves 
   #less calculations than calculating every node but only once per repeat (+1),
   #up to the point where the number of calculations (nodes) > 10^3 and the number
@@ -31,13 +19,14 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
 #' Runs the NpmDelta algorithm, steps are annotated in the code.
 #' @export
 stepSampler_run <- function() {
+  model_lp_initial <-calculate(model, calcNodes)
   positions <- which(model[[target]]!=0)
   for(i in 1:runs){
     #Choose the original position
     pos <- rcat(n = 1, prob = rep(1/length(positions), length(positions)))
     position <- positions[pos]
     #Choosing the direction of the move
-    if(position == length(model[[target]])){
+    if(position == targetLength){
       #if the position is the last time point we can only go backward
       directions <- c(-1)
       direction <- -1
@@ -77,29 +66,9 @@ stepSampler_run <- function() {
          log(length(directions))
       )
     
-    if(direction == 1){
-      calcIndex <- position
-    }else{
-      calcIndex <- newPosition
-    }
-    
-    #model_lp_initial <- model$calculate(model$getDependencies(target[calcIndex:targetLength]))
-    model_lp_initial <- model$calculate(model$getDependencies(nodeNames[calcIndex]))
     model[[target]][position] <<- model[[target]][position] - amount
     model[[target]][newPosition] <<- model[[target]][newPosition] + amount
-    #model_lp_proposed <- model$calculate(model$getDependencies(target[calcIndex:targetLength]))
-    model_lp_proposed <- model$calculate(model$getDependencies(nodeNames[calcIndex]))
-    
-    #if(direction == 1){
-    #  CurrentCalcNodes <- calcNodes[[nodeNames[position]]]
-    #}else{
-    #  CurrentCalcNodes <- calcNodes[[nodeNames[newPosition]]]
-    #}
-    
-    #model_lp_initial <-calculate(model, CurrentCalcNodes)
-    #model[[target]][position] <<- model[[target]][position] - amount
-    #model[[target]][newPosition] <<- model[[target]][newPosition] + amount
-    #model_lp_proposed <- calculate(model, CurrentCalcNodes)
+    model_lp_proposed <- calculate(model, calcNodes)
     
     sampler_lp_initial <-
       (-
@@ -116,12 +85,13 @@ stepSampler_run <- function() {
              (length(model[[target]]) - newPosition)*(-direction == 1)
          )) -
          #choosing direction
-         log(1 + 1*(newPosition != length(model[[target]]) & newPosition != 1))
+         log(1 + 1*(newPosition != targetLength & newPosition != 1))
       )
     log_MH_ratio <- (model_lp_proposed - sampler_lp_proposed) - (model_lp_initial - sampler_lp_initial)
     
     u <- runif(1, 0, 1)
     if(u < exp(log_MH_ratio)){
+      model_lp_initial <- model_lp_proposed
       positions <- which(model[[target]]!=0)
       jump <- TRUE
     }else{
@@ -142,11 +112,12 @@ stepSampler_run <- function() {
 #' annotated in the code.
 #' @export
 stepSampler_run_bounded <- function() {
+  model_lp_initial <-calculate(model, calcNodes)
   pointsToMove <- model[[target]]!=0
   canMoveBackward <- rep(TRUE, length(model[[target]]))
   canMoveBackward[1] <- FALSE
   canMoveForward <- rep(FALSE, length(model[[target]]))
-  for(i in 1:(length(model[[target]])-1)){
+  for(i in 1:(targetLength-1)){
     canMoveForward[i] <- model[["I"]][i+1] > 1
   }
   positions <- which(pointsToMove * (canMoveBackward + canMoveForward - canMoveBackward*canMoveForward))
@@ -208,19 +179,12 @@ stepSampler_run_bounded <- function() {
     positionsRev <- length(positions) + (model[[target]][newPosition] == 0) - (amount == model[[target]][position])
     
     
-    if(direction == 1){
-      calcIndex <- nodeNames[position]
-    }else{
-      calcIndex <- nodeNames[newPosition]
-    }
-    
-    model_lp_initial <- getLogProb(model, calcNodes[[calcIndex]])
     model[[target]][position] <<- model[[target]][position] - amount
     model[[target]][newPosition] <<- model[[target]][newPosition] + amount
-    model_lp_proposed <- calculate(model, calcNodes[[calcIndex]])
+    model_lp_proposed <- calculate(model, calcNodes)
     
     #Calculating the rest of the values for the reverse probability
-    if(newPosition == length(model[[target]])){
+    if(newPosition == targetLength){
       directionsRev <- 1
       #if we are at the last timepoint we can only go backward
     }
@@ -237,7 +201,7 @@ stepSampler_run_bounded <- function() {
       amountsRev <- min(amountsRev, min(model[["I"]][(newPosition+1):(newPosition + size)]) - 1)
     }
     if(direction == -1){
-      sizesRev <- min(maxStep, length(model[[target]]) - newPosition)
+      sizesRev <- min(maxStep, targetLength - newPosition)
       if(sizesRev > size){
         #we know that it must be possible for the size of the proposed jump
         minAmounts <- rep(Inf, sizesRev)
@@ -271,6 +235,7 @@ stepSampler_run_bounded <- function() {
     
     u <- runif(1, 0, 1)
     if(u < exp(log_MH_ratio)){
+      model_lp_initial <- model_lp_proposed
       pointsToMove <- model[[target]]!=0
       for(i in 1:(length(model[[target]])-1)){
         canMoveForward[i] <- model[["I"]][i+1] > 1
