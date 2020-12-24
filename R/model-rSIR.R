@@ -13,19 +13,10 @@ initialValues.rSIR <- function(epiModel, hyperParameters){
   epiModel@Model$GammaRate <- hyperParameters$Priors$Gamma$Rate
   epiModel@Model$newR <- rep(0, length(epiModel@Model$newI))
   epiModel@Model$newR[length(epiModel@Model$newI)] <- sum(epiModel@Model$newI) + 1
-  mcmc <- configureMCMC(epiModel@Model, nodes = NULL)
-  mcmc$addSampler(target = "newR",
-                  type = sampler,
-                  control = list(
-                    TMax = 20,
-                    DeltaMax = 20,
-                    R = hyperParameters$`Initial Values`$Runs
-                  ))
-  mcmc <- buildMCMC(
-    mcmc
-  )
-  mcmc <- compileNimble(mcmc, project = epiModel@Model, resetFunctions = TRUE)
-  mcmc$run(1)
+  #inital censored values
+  last <- epiModel@Model$newI[length(epiModel@Model$newI)]
+  epiModel@Model$newR <- c(0,epiModel@Model$newI[-length(epiModel@Model$newI)])
+  epiModel@Model$newR[length(epiModel@Model$newR)] <- epiModel@Model$newR[length(epiModel@Model$newR)] + last
   return(
     epiModel
   )
