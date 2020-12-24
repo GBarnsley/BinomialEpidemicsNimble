@@ -34,7 +34,7 @@ ASIR <- function(newR,
     I[1] <- 1
     for(i in 1:(ChangePoint-1)){
       newI[i] ~ dbinom(size = S[i],
-                       prob =  probGen(I[i]*Betas[1]*t.step*Pop))
+                       prob =  probGen(I[i]*Betas[1]*t.step*Freq))
       newDR[i] ~ dbinom(size = I[i], prob =  probGen(DGamma*t.step))
       newUR[i] ~ T(dbinom(size = I[i], prob =  probGen(UGamma*t.step)), 0, I[i] - newDR[i])
       S[i+1] <- S[i] - newI[i]
@@ -42,7 +42,7 @@ ASIR <- function(newR,
     }
     for(i in ChangePoint:TimePeriod){
       newI[i] ~ dbinom(size = S[i],
-                       prob =  probGen(I[i]*Betas[2]*t.step*Pop))
+                       prob =  probGen(I[i]*Betas[2]*t.step*Freq))
       newDR[i] ~ dbinom(size = I[i], prob =  probGen(DGamma*t.step))
       newUR[i] ~ T(dbinom(size = I[i], prob =  probGen(UGamma*t.step)), 0, I[i] - newDR[i])
       S[i+1] <- S[i] - newI[i]
@@ -50,9 +50,9 @@ ASIR <- function(newR,
     }
   })
   if(!Frequency){
-    Pop <- 1
+    Freq <- 1
   }else{
-    Pop <- 1/N
+    Freq <- 1/N
   }
   return(ASIRclass(
     Model = compileNimble(
@@ -62,7 +62,7 @@ ASIR <- function(newR,
                          ChangePoint = ChangePoint,
                          t.step = t.step,
                          Pop = Pop,
-                         Frequency = Frequency,),
+                         Freq = Freq),
         data = list(newDR = newR,
                     #priors
                     UGammaShape = 1,
