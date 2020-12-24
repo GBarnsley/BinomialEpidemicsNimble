@@ -5,15 +5,11 @@
 stepSampler_setup <- function(model, mvSaved, target, control) {
   maxStep <- as.integer(control$TMax)
   maxChange <- as.integer(control$DeltaMax)
+  runs <- as.integer(control$R)
   #getting dependant nodes
   calcNodes <- model$getDependencies(target)
-  #This method requires two posterior calculations for each repeat but involves 
-  #less calculations than calculating every node but only once per repeat (+1),
-  #up to the point where the number of calculations (nodes) > 10^3 and the number
-  #of repeats >10^3
-  runs <- as.integer(control$R)
   targetLength <- as.integer(length(model[[target]]))
-  setupOutputs(runs, maxChange,maxStep, calcNodes, nodeNames,targetLength)
+  setupOutputs(runs, maxChange, maxStep, calcNodes, targetLength)
 }
 #' A function used internally in the NpmDelta Sampler.
 #' Runs the NpmDelta algorithm, steps are annotated in the code.
