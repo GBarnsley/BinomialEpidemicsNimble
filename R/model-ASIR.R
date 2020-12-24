@@ -34,7 +34,7 @@ ASIR <- function(newR,
     I[1] <- 1
     for(i in 1:(ChangePoint-1)){
       newI[i] ~ dbinom(size = S[i],
-                       prob =  probGen(I[i]*Betas[1]*t.step/(Pop^Frequency)))
+                       prob =  probGen(I[i]*Betas[1]*t.step*Pop))
       newDR[i] ~ dbinom(size = I[i], prob =  probGen(DGamma*t.step))
       newUR[i] ~ T(dbinom(size = I[i], prob =  probGen(UGamma*t.step)), 0, I[i] - newDR[i])
       S[i+1] <- S[i] - newI[i]
@@ -42,23 +42,28 @@ ASIR <- function(newR,
     }
     for(i in ChangePoint:TimePeriod){
       newI[i] ~ dbinom(size = S[i],
-                       prob =  probGen(I[i]*Betas[2]*t.step/(Pop^Frequency)))
+                       prob =  probGen(I[i]*Betas[2]*t.step*Pop))
       newDR[i] ~ dbinom(size = I[i], prob =  probGen(DGamma*t.step))
       newUR[i] ~ T(dbinom(size = I[i], prob =  probGen(UGamma*t.step)), 0, I[i] - newDR[i])
       S[i+1] <- S[i] - newI[i]
       I[i+1] <- I[i] + newI[i] - newDR[i] - newUR[i]
     }
   })
+  if(!Frequency){
+    Pop <- 1
+  }else{
+    Pop <- 1/N
+  }
   return(ASIRclass(
     Model = compileNimble(
       nimbleModel(
         code = tempCode,
         constants = list(TimePeriod = length(newR),
-                         ChangePoint = ChangePoint),
+                         ChangePoint = ChangePoint,
+                         t.step = t.step,
+                         Pop = Pop,
+                         Frequency = Frequency,),
         data = list(newDR = newR,
-                    t.step = t.step,
-                    Pop = N,
-                    Frequency = Frequency,
                     #priors
                     UGammaShape = 1,
                     UGammaRate = 1,
