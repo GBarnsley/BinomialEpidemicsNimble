@@ -74,11 +74,11 @@ stepSampler_run <- function() {
          log(length(directions))
       )
     
-    if(direction == 1){
-      calcIndex <- nodeNames[position]
-    }else{
+    calcIndex <- nodeNames[position]
+    if(direction == -1){
       calcIndex <- nodeNames[newPosition]
     }
+    
     model_lp_initial <- getLogProb(model, calcNodes[[calcIndex]])
     model[[target]][position] <<- model[[target]][position] - amount
     model[[target]][newPosition] <<- model[[target]][newPosition] + amount
@@ -191,11 +191,12 @@ stepSampler_run_bounded <- function() {
     #some of these are easier to find when we haven't updated the values
     positionsRev <- length(positions) + (model[[target]][newPosition] == 0) - (amount == model[[target]][position])
     
-    if(direction == 1){
-      calcIndex <- nodeNames[position]
-    }else{
+    
+    calcIndex <- nodeNames[position]
+    if(direction == -1){
       calcIndex <- nodeNames[newPosition]
     }
+    
     
     model_lp_initial <- getLogProb(model, calcNodes[[calcIndex]])
     model[[target]][position] <<- model[[target]][position] - amount
