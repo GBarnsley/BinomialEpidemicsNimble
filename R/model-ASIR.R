@@ -100,9 +100,9 @@ initialValues.ASIR <- function(epiModel, hyperParameters){
   epiModel@Model$R0SDs <- hyperParameters$Priors$R0$SDs
 
   epiModel@Model$newUR <- round(epiModel@Model$newDR*hyperParameters$ProportionUndetected)
-  firstRow <- epiModel@Model$newUR[1] + epiModel@Model$newDR[1]
-  epiModel@Model$newI <- epiModel@Model$newUR[-1] + epiModel@Model$newDR[-1]
-  epiModel@Model$newI[1] <- epiModel@Model$newI[1] + firstRow
+  first <- epiModel@Model$newUR[1] + epiModel@Model$newDR[1]
+  epiModel@Model$newI <- c(epiModel@Model$newUR[-1] + epiModel@Model$newDR[-1], 0)
+  epiModel@Model$newI[1] <- epiModel@Model$newI[1] + first - 1
   return(
     epiModel
   )
