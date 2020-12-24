@@ -63,11 +63,11 @@ COVIDModel <- function(newD,
                          Regions = nrow(newD),
                          t.step = t.step,
                          Connectivity = Connectivity,
-                         Frequency = Frequency
+                         Frequency = Frequency,
+                         Pop = Pop
                          ),
         data = list(newD = newD,
                     StartRegion = StartRegion,
-                    Pop = Pop,
                     TestCapacity = TestCapacity,
                     GammaRate = 1,
                     GammaShape = 1,
