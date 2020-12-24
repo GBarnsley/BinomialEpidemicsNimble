@@ -11,8 +11,6 @@ initialValues.rSIR <- function(epiModel, hyperParameters){
   epiModel@Model$BetaRate <- hyperParameters$Priors$Beta$Rate
   epiModel@Model$GammaShape <- hyperParameters$Priors$Gamma$Shape
   epiModel@Model$GammaRate <- hyperParameters$Priors$Gamma$Rate
-  epiModel@Model$newR <- rep(0, length(epiModel@Model$newI))
-  epiModel@Model$newR[length(epiModel@Model$newI)] <- sum(epiModel@Model$newI) + 1
   #inital censored values
   last <- epiModel@Model$newI[length(epiModel@Model$newI)]
   epiModel@Model$newR <- c(0,epiModel@Model$newI[-length(epiModel@Model$newI)])
