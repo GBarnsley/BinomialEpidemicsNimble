@@ -22,8 +22,8 @@ SEIR <- function(newR = NULL,
   inits <- list(Beta = 1,
                 Gamma = 1,
                 k = 1,
-                newI = c(0, sum(newR)-1, rep(0, length(newR) - 2)),
-                newE = c(sum(newR)-1, rep(0, length(newR) - 1))
+                newI = rep(0, length(newR)),
+                newE =  rep(0, length(newR))
   )
   data <- list(newR = newR,
               #priors
@@ -90,26 +90,12 @@ initialValues.SEIR <- function(epiModel, hyperParameters){
   epiModel@Model$R0Mean <- hyperParameters$Priors$R0$Mean
   epiModel@Model$R0SD <- hyperParameters$Priors$R0$SD
   #generating starting newI, newE values
-  mcmc <- configureMCMC(epiModel@Model, nodes = NULL)
-  mcmc$addSampler(target = "newE",
-                  type = sampler,
-                  control = list(
-                    TMax = 20,
-                    DeltaMax = 20,
-                    R = 1
-                  ))
-  mcmc$addSampler(target = "newI",
-                  type = sampler,
-                  control = list(
-                    TMax = 20,
-                    DeltaMax = 20,
-                    R = 1
-                  ))
-  mcmc <- buildMCMC(
-    mcmc
-  )
-  mcmc <- compileNimble(mcmc, project = epiModel@Model, resetFunctions = TRUE)
-  mcmc$run(hyperParameters$`Initial Values`$Runs)
+  first <- sum(epiModel@Model$newR[1:2])
+  epiModel@Model$newE <- c(0,epiModel@Model$newR[c(-1,-2)],0)
+  epiModel@Model$newE[2] <- epiModel@Model$newE[2] + first
+  first <- epiModel@Model$newE[1]
+  epiModel@Model$newI <- c(epiModel@Model$newE,0)
+  epiModel@Model$newI[1] + epiModel@Model$newI[1] + first - 1
   return(
     epiModel
   )
@@ -118,9 +104,10 @@ initialValues.SEIR <- function(epiModel, hyperParameters){
 #' the NpmDelta sampler to newE and newI.
 #' @param epiModel An object of the SEIR class
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
+#' @param showCompilerOutput Whether compileNimble should prince the compiler output
 #' @return a complied MCMC
 #' @export
-buildMCMCInternal.SEIR <- function(epiModel, hyperParameters){
+buildMCMCInternal.SEIR <- function(epiModel, hyperParameters, showCompilerOutput){
   output <- configureMCMC(epiModel@Model, nodes = NULL)
   output$addSampler(target = c('Beta', 'Gamma', 'k'),
                     type = sampler_RW_block,
@@ -135,6 +122,6 @@ buildMCMCInternal.SEIR <- function(epiModel, hyperParameters){
   output <- buildMCMC(
     output
   )
-  output <- compileNimble(output, project = epiModel@Model, resetFunctions = TRUE)
+  output <- compileNimble(output, project = epiModel@Model, resetFunctions = TRUE, showCompilerOutput = showCompilerOutput)
   return(output)
 }
