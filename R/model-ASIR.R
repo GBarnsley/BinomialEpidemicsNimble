@@ -21,8 +21,7 @@ ASIR <- function(newR,
                 N,
                 t.step = 1,
                 Frequency = TRUE,
-                ChangePoint,
-                TotalInfections){
+                ChangePoint){
   tempCode <- nimbleCode({
     # Set priors
     UGamma ~ dgamma(shape = UGammaShape, rate = UGammaRate)
@@ -50,7 +49,6 @@ ASIR <- function(newR,
       I[i+1] <- I[i] + newI[i] - newDR[i] - newUR[i]
     }
   })
-  hiddenInfections <- TotalInfections - sum(newR)
   return(ASIRclass(
     Model = compileNimble(
       nimbleModel(
@@ -72,8 +70,8 @@ ASIR <- function(newR,
         inits = list(Betas = rep(1, 2),
                      UGamma = 1,
                      DGamma = 1,
-                     newI = c(TotalInfections-1, rep(0, length(newR)-1)),
-                     newUR = c(rep(0, length(newR)-1), hiddenInfections)
+                     newI = rep(0, length(newR)),
+                     newUR = rep(0, length(newR))
         ),
         calculate = FALSE
       )
@@ -114,6 +112,7 @@ initialValues.ASIR <- function(epiModel, hyperParameters){
 #' on newI and newUR.
 #' @param epiModel An object of the ASIR class
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
+#' @param showCompilerOutput Whether compileNimble should prince the compiler output
 #' @return a complied MCMC
 #' @export
 buildMCMCInternal.ASIR <- function(epiModel, hyperParameters, showCompilerOutput){
