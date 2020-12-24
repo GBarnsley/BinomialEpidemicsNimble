@@ -23,7 +23,7 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
   #up to the point where the number of calculations (nodes) > 10^3 and the number
   #of repeats >10^3
   runs <- as.integer(control$R)
-  setupOutputs(runs, maxChange,MaxStep, calcNodes, nodeNames)
+  setupOutputs(runs, maxChange,maxStep, calcNodes, nodeNames)
 }
 #' A function used internally in the NpmDelta Sampler.
 #' Runs the NpmDelta algorithm, steps are annotated in the code.
