@@ -139,7 +139,7 @@ initialValues.COVIDUK <- function(epiModel, hyperParameters){
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
 #' @return a complied MCMC
 #' @export
-buildMCMCInternal.COVIDUK <- function(epiModel, hyperParameters){
+buildMCMCInternal.COVIDUK <- function(epiModel, hyperParameters, showCompilerOutput){
   output <- configureMCMC(epiModel@Model, nodes = NULL)
   for(i in 1:nrow(epiModel@Model$newD)){
     output$addSampler(target = paste0("newI[",i,",]"),
@@ -163,7 +163,7 @@ buildMCMCInternal.COVIDUK <- function(epiModel, hyperParameters){
                     type = "RW")
   output$addMonitors(c('Alpha','Beta', 'Gamma','Lockdown[1]','Lockdown[2]','newI','newR'))
   output <- buildMCMC(output)
-  output <- compileNimble(output, project = epiModel@Model, resetFunctions = TRUE)
+  output <- compileNimble(output, project = epiModel@Model, resetFunctions = TRUE, showCompilerOutput = showCompilerOutput)
   return(output)
 }
 #' A ultility function to import national timeseries data for use in COVIDUK model.
