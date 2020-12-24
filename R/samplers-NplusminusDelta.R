@@ -15,8 +15,7 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
   calcNodes <- calcNodes$new()
   nodeNames <- c()
   for(i in 1:length(model[[target]])){
-    #nodeNames[i] <- as.character(i)
-    nodeNames[i] <- paste0(target,"[",i,":",length(model[[target]]),"]")
+    nodeNames[i] <- as.character(i)
     calcNodes[[as.character(i)]] <- model$getDependencies(paste0(target,"[",i,":",length(model[[target]]),"]"))
   }
   #This method requires two posterior calculations for each repeat but involves 
@@ -24,6 +23,7 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
   #up to the point where the number of calculations (nodes) > 10^3 and the number
   #of repeats >10^3
   runs <- as.integer(control$R)
+  setupOutputs(runs, maxChange,MaxStep, calcNodes, nodeNames)
 }
 #' A function used internally in the NpmDelta Sampler.
 #' Runs the NpmDelta algorithm, steps are annotated in the code.
@@ -76,11 +76,9 @@ stepSampler_run <- function() {
       )
     
     if(direction == 1){
-      #CurrentCalcNodes <- calcNodes[[nodeNames[position]]]
-      CurrentCalcNodes <- getDependencies(model, nodeNames[position])
+      CurrentCalcNodes <- calcNodes[[nodeNames[position]]]
     }else{
-      #CurrentCalcNodes <- calcNodes[[nodeNames[newPosition]]]
-      CurrentCalcNodes <- getDependencies(model, nodeNames[newPosition])
+      CurrentCalcNodes <- calcNodes[[nodeNames[newPosition]]]
     }
     
     model_lp_initial <- getLogProb(model, CurrentCalcNodes)
