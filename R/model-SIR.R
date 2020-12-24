@@ -36,6 +36,11 @@ SIR <- function(newI = NULL,
                 N = NULL,
                 t.step = 1,
                 Frequency = TRUE){
+  if(!Frequency){
+    Freq <- 1
+  }else{
+    Freq <- 1/N
+  }
   #calculating initial values from given dataS
   if(is.null(N)){
     print("Error: N must be specified")
@@ -51,7 +56,7 @@ SIR <- function(newI = NULL,
     I[1] <- 1
     for(i in 1:TimePeriod){
       newI[i] ~ dbinom(size = S[i],
-                       prob =  probGen(I[i]*Beta*t.step/(Pop^Frequency)))
+                       prob =  probGen(I[i]*Beta*t.step*Freq))
       newR[i] ~ dbinom(size = I[i], prob =  probGen(Gamma*t.step))
       S[i+1] <- S[i] - newI[i]
       I[i+1] <- I[i] + newI[i] - newR[i]
@@ -62,15 +67,16 @@ SIR <- function(newI = NULL,
       Model = compileNimble(
         nimbleModel(
           code = tempCode,
-          constants = list(TimePeriod = length(newR)),
-          data = list(newR = newR,
+          constants = list(TimePeriod = length(newR),
                       t.step = t.step,
                       Pop = N,
+                      Freq=Freq),
+          data = list(newR = newR,
                       BetaShape = 1,
                       BetaRate = 1,
                       GammaShape = 1,
-                      GammaRate = 1,
-                      Frequency = Frequency),
+                      GammaRate = 1
+                      ),
           inits = list(Beta = 1,
                        Gamma = 1,
                        newI = rep(0, length(newR))
@@ -88,15 +94,15 @@ SIR <- function(newI = NULL,
       Model = compileNimble(
         nimbleModel(
           code = tempCode,
-          constants = list(TimePeriod = length(newI)),
+          constants = list(TimePeriod = length(newI),
+                           Freq = Freq,
+                           Pop = N,
+                           t.step = t.step),
           data = list(newI = newI,
-                      Pop = N,
-                      t.step = t.step,
                       BetaShape = 1,
                       BetaRate = 1,
                       GammaShape = 1,
-                      GammaRate = 1,
-                      Frequency = Frequency),
+                      GammaRate = 1),
           inits = list(Beta = 1,
                        Gamma = 1,
                        newR = rep(0, length(newI))
@@ -117,7 +123,7 @@ SIR <- function(newI = NULL,
       # likelihood
       for(i in 1:TimePeriod){
         newI[i] ~ dbinom(size = S[i],
-                         prob =  probGen(I[i]*Beta*t.step/(Pop^Frequency)))
+                         prob =  probGen(I[i]*Beta*t.step*Freq))
         newR[i] ~ dbinom(size = I[i], prob =  probGen(Gamma*t.step))
       }
     })
@@ -125,18 +131,19 @@ SIR <- function(newI = NULL,
       Model = compileNimble(
         nimbleModel(
           code = tempCode,
-          constants = list(TimePeriod = length(newI)),
+          constants = list(TimePeriod = length(newI),
+                           Freq = Freq,
+                           t.step = t.step,
+                           Pop = N),
           data = list(I = I,
                       S = S,
                       newI = newI,
                       newR = newR,
-                      t.step = t.step,
                       BetaShape = 1,
                       BetaRate = 1,
                       GammaShape = 1,
-                      GammaRate = 1,
-                      Frequency = Frequency,
-                      Pop = N),
+                      GammaRate = 1
+                      ),
           inits = list(Beta = 1,
                        Gamma = 1
           ),
