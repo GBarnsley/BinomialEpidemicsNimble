@@ -56,9 +56,7 @@ ASIR <- function(newR,
       nimbleModel(
         code = tempCode,
         constants = list(TimePeriod = length(newR),
-                         ChangePoint = ChangePoint,
-                         hiddenInfections = hiddenInfections,
-                         detectedInfections = sum(newR)),
+                         ChangePoint = ChangePoint),
         data = list(newDR = newR,
                     t.step = t.step,
                     Pop = N,
@@ -103,26 +101,10 @@ initialValues.ASIR <- function(epiModel, hyperParameters){
   epiModel@Model$R0Means <- hyperParameters$Priors$R0$Means
   epiModel@Model$R0SDs <- hyperParameters$Priors$R0$SDs
 
-  mcmc <- configureMCMC(epiModel@Model, nodes = NULL)
-  mcmc$addSampler(target = "newI",
-                  type = sampler,
-                  control = list(
-                    TMax = 20,
-                    DeltaMax = 20,
-                    R = 1
-                  ))
-  mcmc$addSampler(target = "newUR",
-                  type = sampler,
-                  control = list(
-                    TMax = 20,
-                    DeltaMax = 20,
-                    R = 1
-                  ))
-  mcmc <- buildMCMC(
-    mcmc
-  )
-  mcmc <- compileNimble(mcmc, project = epiModel@Model, resetFunctions = TRUE)
-  mcmc$run(hyperParameters$`Initial Values`$Runs)
+  epiModel@Model$newUR <- round(epiModel@Model$newDR*hyperParameters$ProportionUndetected)
+  firstRow <- epiModel@Model$newUR[1] + epiModel@Model$newDR[1]
+  epiModel@Model$newI <- epiModel@Model$newUR[-1] + epiModel@Model$newDR[-1]
+  epiModel@Model$newI[1] <- epiModel@Model$newI[1] + firstRow
   return(
     epiModel
   )
@@ -134,7 +116,7 @@ initialValues.ASIR <- function(epiModel, hyperParameters){
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
 #' @return a complied MCMC
 #' @export
-buildMCMCInternal.ASIR <- function(epiModel, hyperParameters){
+buildMCMCInternal.ASIR <- function(epiModel, hyperParameters, showCompilerOutput){
   output <- configureMCMC(epiModel@Model, nodes = NULL)
   output$addSampler(target = c('Betas[1]', 'Betas[2]', 'UGamma', 'DGamma'),
                     type = sampler_RW_block,
@@ -150,6 +132,6 @@ buildMCMCInternal.ASIR <- function(epiModel, hyperParameters){
   output <- buildMCMC(
     output
   )
-  output <- compileNimble(output, project = epiModel@Model, resetFunctions = TRUE)
+  output <- compileNimble(output, project = epiModel@Model, resetFunctions = TRUE, showCompilerOutput=showCompilerOutput)
   return(output)
 }
