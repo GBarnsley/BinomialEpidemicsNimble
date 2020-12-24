@@ -9,7 +9,6 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
   #getting dependant nodes
   calcNodes <- model$getDependencies(target)
   targetLength <- as.integer(length(model[[target]]))
-  setupOutputs(runs, maxChange, maxStep, calcNodes, targetLength)
 }
 #' A function used internally in the NpmDelta Sampler.
 #' Runs the NpmDelta algorithm, steps are annotated in the code.
