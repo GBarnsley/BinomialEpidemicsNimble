@@ -42,7 +42,7 @@ COVIDModel <- function(newD,
       for (t in 1:TimePeriod){
         newI[region,t] ~ dbinom(size = S[region,t],
                                 prob =  probGen(
-                                  sum(connectivity[region,1:Regions]*I[1:Regions,t]*Pop)*
+                                  sum(connectivity[region,1:Regions]*I[1:Regions,t]*Freq)*
                                     Beta*
                                     Lockdown[1]^((t>=ChangePoint[1] & t<ChangePoint[2])|(t>=ChangePoint[3] & t<ChangePoint[4]))*
                                     Lockdown[2]^((t>=ChangePoint[2] & t<ChangePoint[3])|t>=ChangePoint[4])*
@@ -55,9 +55,9 @@ COVIDModel <- function(newD,
     }
   })
   if(!Frequency){
-    Pop <- rep(1,length(Pop))
+    Freq <- 1
   }else{
-    Pop <- 1/Pop
+    Freq <- 1/N
   }
   return(COVIDUKclass(
     Model = compileNimble(
@@ -68,7 +68,7 @@ COVIDModel <- function(newD,
                          Regions = nrow(newD),
                          t.step = t.step,
                          Connectivity = Connectivity,
-                         Frequency = Frequency,
+                         Freq = Freq,
                          Pop = Pop
                          ),
         data = list(newD = newD,
