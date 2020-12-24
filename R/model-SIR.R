@@ -73,7 +73,7 @@ SIR <- function(newI = NULL,
                       Frequency = Frequency),
           inits = list(Beta = 1,
                        Gamma = 1,
-                       newI = c(sum(newR) - 1, rep(0, length(newR) - 1))
+                       newI = rep(0, length(newR))
           ),
           calculate = FALSE
         )
@@ -99,7 +99,7 @@ SIR <- function(newI = NULL,
                       Frequency = Frequency),
           inits = list(Beta = 1,
                        Gamma = 1,
-                       newR = c(rep(0, length(newI) - 1), sum(newI) + 1)
+                       newR = rep(0, length(newI))
           ),
           calculate = FALSE
         )
