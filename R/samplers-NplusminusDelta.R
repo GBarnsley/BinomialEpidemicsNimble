@@ -15,7 +15,7 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
   calcNodes <- calcNodes$new()
   nodeNames <- c()
   for(i in 1:length(model[[target]])){
-    nodeNames[i] <- as.character(i)
+    nodeNames[i] <- paste0(target,"[",as.character(i),"]")
     calcNodes[[as.character(i)]] <- model$getDependencies(paste0(target,"[",i,":",length(model[[target]]),"]"))
   }
   #This method requires two posterior calculations for each repeat but involves 
@@ -82,10 +82,12 @@ stepSampler_run <- function() {
       calcIndex <- newPosition
     }
     
-    model_lp_initial <- model$calculate(model$getDependencies(target[calcIndex:targetLength]))
+    #model_lp_initial <- model$calculate(model$getDependencies(target[calcIndex:targetLength]))
+    model_lp_initial <- model$calculate(model$getDependencies(nodeNames[calcIndex]))
     model[[target]][position] <<- model[[target]][position] - amount
     model[[target]][newPosition] <<- model[[target]][newPosition] + amount
-    model_lp_proposed <- model$calculate(model$getDependencies(target[calcIndex:targetLength]))
+    #model_lp_proposed <- model$calculate(model$getDependencies(target[calcIndex:targetLength]))
+    model_lp_proposed <- model$calculate(model$getDependencies(nodeNames[calcIndex]))
     
     #if(direction == 1){
     #  CurrentCalcNodes <- calcNodes[[nodeNames[position]]]
