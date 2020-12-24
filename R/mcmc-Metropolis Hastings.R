@@ -16,7 +16,9 @@ metropolisHastings <- function(epiModel,
                                showCompilerOutput = FALSE){
   epiModel <- initialValues(epiModel, hyperParameters)
   epiModel@MCMC <- buildMCMCInternal(epiModel, hyperParameters, showCompilerOutput)
-  epiModel@MCMC$run(niter = samples*thin + burnin, thin = thin, nburnin = burnin)
-  epiModel@Samples <- as.matrix(epiModel@MCMC$mvSamples)
+  if(samples>0){
+    epiModel@MCMC$run(niter = samples*thin + burnin, thin = thin, nburnin = burnin)
+    epiModel@Samples <- as.matrix(epiModel@MCMC$mvSamples)
+   }
   return(epiModel)
 }
