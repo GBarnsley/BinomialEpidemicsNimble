@@ -4,7 +4,7 @@
 #' @param hyperParameters A list of lists of the hyper-parameters for the epidemic model and MCMC
 #' @return An object of the given epidemic class with a compiled MCMC
 #' @export
-buildMCMCInternal <- function(epiModel, hyperParameters){
+buildMCMCInternal <- function(epiModel, hyperParameters, showCompilerOutput){
   sampler <- nimbleFunction(
     contains = sampler_BASE,
     setup = stepSampler_setup,
