@@ -19,6 +19,11 @@ SEIR <- function(newR = NULL,
                  N,
                  t.step = 1,
                  Frequency = TRUE){
+  if(!Frequency){
+    Freq <- 1
+  }else{
+    Freq <- 1/N
+  }
   inits <- list(Beta = 1,
                 Gamma = 1,
                 k = 1,
@@ -37,7 +42,7 @@ SEIR <- function(newR = NULL,
   tempCode <- nimbleCode({
     # Set priors
     Gamma ~ dgamma(shape = GammaShape, rate = GammaRate)
-    Beta ~ T(dnorm(mean = R0Mean[1]*Gamma*Pop^(Frequency == 0), sd = R0SD[1]), 0, Inf)
+    Beta ~ T(dnorm(mean = R0Mean[1]*Gamma*Pop*Freq, sd = R0SD[1]), 0, Inf)
     k ~ dgamma(shape = kShape, rate = kRate)
     # likelihood
     S[1] <- Pop - 1
@@ -45,7 +50,7 @@ SEIR <- function(newR = NULL,
     I[1] <- 1
     for(i in 1:TimePeriod){
       newE[i] ~ dbinom(size = S[i],
-                       prob =  probGen(I[i]*Beta*t.step/(Pop^Frequency)))
+                       prob =  probGen(I[i]*Beta*t.step*Freq))
       newI[i] ~ dbinom(size = E[i], prob =  probGen(k*t.step))
       newR[i] ~ dbinom(size = I[i], prob =  probGen(Gamma*t.step))
       S[i+1] <- S[i] - newE[i]
@@ -59,8 +64,8 @@ SEIR <- function(newR = NULL,
         code = tempCode,
         constants = list(TimePeriod = length(newR),
                          Pop = N,
-                         t.step = t.step,
-                         Frequency = Frequency),
+                         Freq = Freq,
+                         t.step = t.step),
         data = data,
         inits = inits,
         calculate = FALSE
