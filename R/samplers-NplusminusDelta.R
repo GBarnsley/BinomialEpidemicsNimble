@@ -23,7 +23,8 @@ stepSampler_setup <- function(model, mvSaved, target, control) {
   #up to the point where the number of calculations (nodes) > 10^3 and the number
   #of repeats >10^3
   runs <- as.integer(control$R)
-  setupOutputs(runs, maxChange,maxStep, calcNodes, nodeNames)
+  targetLength <- as.integer(length(model[[target]]))
+  setupOutputs(runs, maxChange,maxStep, calcNodes, nodeNames,targetLength)
 }
 #' A function used internally in the NpmDelta Sampler.
 #' Runs the NpmDelta algorithm, steps are annotated in the code.
@@ -81,10 +82,10 @@ stepSampler_run <- function() {
       calcIndex <- newPosition
     }
     
-    model_lp_initial <- model$calculate(target[calcIndex:length(model[[target]])])
+    model_lp_initial <- model$calculate(target[calcIndex:targetLength])
     model[[target]][position] <<- model[[target]][position] - amount
     model[[target]][newPosition] <<- model[[target]][newPosition] + amount
-    model_lp_proposed <- model$calculate(target[calcIndex:length(model[[target]])])
+    model_lp_proposed <- model$calculate(target[calcIndex:targetLength])
     
     #if(direction == 1){
     #  CurrentCalcNodes <- calcNodes[[nodeNames[position]]]
