@@ -50,29 +50,21 @@ additiveSampler_run <- function() {
     model[[target]][position] <<- model[[target]][position] + addSub*amount ###CARRYON FROM HERE
     model_lp_proposed <- calculate(model, calcNodes)
     
+    subPositionsNew <- which(model[[target]]!=0)
+    
     sampler_lp_initial <-
       (-
          #Choosing that time point
-         log(sum(model[[target]]!=0)) -
+         log(if(addSub==0){targetLength}else{length(subPositionsNew)}) -
          #choosing that that amount point of points to move
-         log(
-           min(maxChange, model[[target]][newPosition])
-         ) -
-         #choosing the size of the move
-         log(min(
-           maxStep,
-           (newPosition - 1)*(-direction == -1) +
-             (length(model[[target]]) - newPosition)*(-direction == 1)
-         )) -
-         #choosing direction
-         log(1 + 1*(newPosition != targetLength & newPosition != 1))
+         log(if(addSub==0){addSubMax}else{min(model[[target]][position],addSubMax)})
       )
     log_MH_ratio <- (model_lp_proposed - sampler_lp_proposed) - (model_lp_initial - sampler_lp_initial)
     
     u <- runif(1, 0, 1)
     if(u < exp(log_MH_ratio)){
       model_lp_initial <- model_lp_proposed
-      positions <- which(model[[target]]!=0)
+      subPositions <- subPositionsNew
       jump <- TRUE
     }else{
       jump <- FALSE
