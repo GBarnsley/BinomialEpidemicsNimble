@@ -36,6 +36,9 @@ COVIDModel <- function(newD,
     Lockdown[1] ~ dgamma(shape = LockdownShape[1], rate = LockdownRate[1])
     Lockdown[2] ~ dgamma(shape = LockdownShape[2], rate = LockdownRate[2])
     # Likelihood
+    for (t in 1:TimePeriod){
+        probabilities[t,1:3] <- multiProbGen(x=c(Alpha*t.step*TestCapacity[t], Gamma*t.step))
+     }
     for(region in 1:Regions){
       S[region,1] <- Pop[region] - (region == StartRegion)
       I[region,1] <- 0 + (region == StartRegion)
@@ -47,10 +50,10 @@ COVIDModel <- function(newD,
                                     Lockdown[1]^((t>=ChangePoint[1] & t<ChangePoint[2])|(t>=ChangePoint[3] & t<ChangePoint[4]))*
                                     Lockdown[2]^((t>=ChangePoint[2] & t<ChangePoint[3])|t>=ChangePoint[4])*
                                     t.step))
-        newD[region,t] ~ dbinom(size = I[region,t], prob = probGen(Alpha*t.step*TestCapacity[t]))
-        newR[region,t] ~ dbinom(size = I[region,t] - newD[region,t], prob = probGen(Gamma*t.step))
+        newD[region,t] ~ dbinom(size = I[region,t], prob = probabilities[t,1])
+        newR[region,t] ~ dbinom(size = I[region,t] - newD[region,t], prob = probabilities[t,2]/(1-probabilities[t,1]))
         S[region,t+1] <- S[region,t] - newI[region,t]
-        I[region,t+1] <- I[region,t] + newI[region,t] - newD[region,t] - newR[region,t]
+        I[region,t+1] <- I[region,t] + newI[region,t] -  newD[region,t] -  newR[region,t]
       }
     }
   })
