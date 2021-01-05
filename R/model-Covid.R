@@ -40,7 +40,7 @@ COVIDModel <- function(newD,
       S[region,1] <- Pop[region] - (region == StartRegion)
       I[region,1] <- 0 + (region == StartRegion)
       for (t in 1:TimePeriod){
-        probabilities[region,t,1:3] <- multiProbGen(Alpha*t.step*TestCapacity[t], Gamma*t.step)
+        probabilities[region,t,1:3] <- multiProbGen(c(Alpha*t.step*TestCapacity[t], Gamma*t.step))
         newI[region,t] ~ dbinom(size = S[region,t],
                                 prob =  probGen(
                                   sum(Connectivity[region,1:Regions]*I[1:Regions,t]*Freq[1:Regions])*
