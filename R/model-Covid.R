@@ -59,7 +59,6 @@ COVIDModel <- function(newD,
   }else{
     Freq <- 1/Pop
   }
-  print(Freq)
   return(COVIDUKclass(
     Model = compileNimble(
       nimbleModel(
@@ -69,10 +68,10 @@ COVIDModel <- function(newD,
                          Regions = nrow(newD),
                          t.step = t.step,
                          Connectivity = Connectivity,
-                         Freq = Freq,
                          Pop = Pop
                          ),
         data = list(newD = newD,
+                    Freq = Freq,
                     StartRegion = StartRegion,
                     TestCapacity = TestCapacity,
                     GammaRate = 1,
