@@ -37,7 +37,7 @@ COVIDModel <- function(newD,
     Lockdown[2] ~ dgamma(shape = LockdownShape[2], rate = LockdownRate[2])
     # Likelihood
     for (t in 1:TimePeriod){
-        probabilities[t,1:3] <- multiProbGen(x=c(Alpha*t.step*TestCapacity[t], Gamma*t.step))
+        probabilities[t,1:3] <- c(0.25,0.25,0.5)#multiProbGen(x=c(Alpha*t.step*TestCapacity[t], Gamma*t.step))
      }
     for(region in 1:Regions){
       S[region,1] <- Pop[region] - (region == StartRegion)
