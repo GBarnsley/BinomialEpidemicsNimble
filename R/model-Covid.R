@@ -47,10 +47,9 @@ COVIDModel <- function(newD,
                                     Lockdown[1]^((t>=ChangePoint[1] & t<ChangePoint[2])|(t>=ChangePoint[3] & t<ChangePoint[4]))*
                                     Lockdown[2]^((t>=ChangePoint[2] & t<ChangePoint[3])|t>=ChangePoint[4])*
                                     t.step))
-        newD[region,t] ~ dbinom(size = I[region,t], prob = probGen(Alpha*t.step*TestCapacity[t]))
-        newR[region,t] ~ dbinom(size = I[region,t] - newD[region,t], prob = probGen(Gamma*t.step))
+        oldIs[region,t,1:3] ~ dmulti(size = I[region,t], prob = multiProbGen(Alpha*t.step*TestCapacity[t], Gamma*t.step))
         S[region,t+1] <- S[region,t] - newI[region,t]
-        I[region,t+1] <- I[region,t] + newI[region,t] - newD[region,t] - newR[region,t]
+        I[region,t+1] <- newI[region,t] + oldIs[region,t,3]
       }
     }
   })
@@ -69,7 +68,7 @@ COVIDModel <- function(newD,
                          t.step = t.step,
                          Pop = Pop
                          ),
-        data = list(newD = newD,
+        data = list(oldIs[,,1] = newD,
                     Freq = Freq,
                     Connectivity = Connectivity,
                     StartRegion = StartRegion,
@@ -88,7 +87,7 @@ COVIDModel <- function(newD,
                      Alpha = 1,
                      Lockdown = c(0.8,0.9),
                      newI = newD,
-                     newR = newD
+                     oldIs[,,2] = newD
         ),
         calculate = FALSE
       )
@@ -121,7 +120,7 @@ initialValues.COVIDUK <- function(epiModel, hyperParameters){
   epiModel@Model$LockdownRate <- hyperParameters$Priors$Lockdown$Rate
   epiModel@Model$LockdownShape <- hyperParameters$Priors$Lockdown$Shape
   #generating initial newI and newR
-  newD <- epiModel@Model$newD
+  newD <- epiModel@Model$oldIs[,,1]
   newR <- round(newD*hyperParameters$Priors$ProportionUndetected)
   #storing first row of dections/removals
   firstRow <- newD[,1] + newR[,1]
@@ -131,7 +130,7 @@ initialValues.COVIDUK <- function(epiModel, hyperParameters){
   newI[,1] <- newI[,1] + firstRow
   #removing an infection from start region since we assume it begins with an already exiting infection
   newI[epiModel@Model$StartRegion,newI[epiModel@Model$StartRegion,]!=0][1] <- newI[epiModel@Model$StartRegion,newI[epiModel@Model$StartRegion,]!=0][1] - 1
-  epiModel@Model$newR <- newR
+  epiModel@Model$oldIs[,,2] <- newR
   epiModel@Model$newI <- newI
   return(
     epiModel
@@ -152,7 +151,7 @@ buildMCMCInternal.COVIDUK <- function(epiModel, hyperParameters, showCompilerOut
                       type = sampler,
                       control = hyperParameters$`N+-Delta`
                       )
-    output$addSampler(target = paste0("newR[",i,",]"),
+    output$addSampler(target = paste0("oldIs[",i,",,2]"),
                       type = sampler,
                       control = hyperParameters$`N+-Delta`
                       )
