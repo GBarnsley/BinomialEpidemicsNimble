@@ -25,7 +25,7 @@ probGen <- nimble::nimbleFunction(
 #' @param x some non-negative values
 #' @return a set of values on the range (0,1) that sum to 1
 #' @export
-multiProb <- function(values){
+multiProbGen <- function(values){
   failValue <- sum(values)
   values <- c(probGen(values),exp(-failValue))
   return(values/sum(values))
