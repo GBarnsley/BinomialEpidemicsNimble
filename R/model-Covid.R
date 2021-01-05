@@ -58,6 +58,8 @@ COVIDModel <- function(newD,
   }else{
     Freq <- 1/Pop
   }
+  oldIs <- array(NA,dim=c(nrow(newD),ncol(newD),3))
+  oldIs[,,1] <- newD
   return(COVIDUKclass(
     Model = compileNimble(
       nimbleModel(
@@ -68,7 +70,7 @@ COVIDModel <- function(newD,
                          t.step = t.step,
                          Pop = Pop
                          ),
-        data = list(oldIs[,,1] = newD,
+        data = list(oldIs = oldIs,
                     Freq = Freq,
                     Connectivity = Connectivity,
                     StartRegion = StartRegion,
@@ -86,8 +88,7 @@ COVIDModel <- function(newD,
                      Gamma = 1,
                      Alpha = 1,
                      Lockdown = c(0.8,0.9),
-                     newI = newD,
-                     oldIs[,,2] = newD
+                     newI = newD
         ),
         calculate = FALSE
       )
