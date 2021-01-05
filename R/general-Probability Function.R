@@ -8,8 +8,8 @@
 #' @return a value on the range (0,1)
 #' @export
 probGen <- nimble::nimbleFunction(
-  run = function(x = double(0)) {
-    returnType(double(0))
+  run = function(x = double(1)) {
+    returnType(double(1))
     return(1 - exp(-x))
   }
 )
