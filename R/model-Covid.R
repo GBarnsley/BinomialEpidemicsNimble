@@ -238,6 +238,8 @@ ImportCOVIDUKTimeSeries <- function(population,
   #flipping to correct order and imputing capacity from start date to first set of date, just assume linear increase from 0
   TestCapacity <- c(seq(0,RawTestCapacity$test[which.min(RawTestCapacity$date)],length.out=min(RawTestCapacity$date)-startDate),
                     rev(RawTestCapacity$test))
+  #standardising to be 0-100
+  TestCapacity <- 100*TestCapacity/max(TestCapacity)
   ###Setting up ChangePoints
   ChangePoint <- c(Lockdown1Date, Lockdown2Date, Lockdown1Date2, Lockdown2Date2) - startDate
   ###Setting up StartRegion
