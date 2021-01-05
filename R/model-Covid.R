@@ -36,11 +36,13 @@ COVIDModel <- function(newD,
     Lockdown[1] ~ dgamma(shape = LockdownShape[1], rate = LockdownRate[1])
     Lockdown[2] ~ dgamma(shape = LockdownShape[2], rate = LockdownRate[2])
     # Likelihood
+    for (t in 1:TimePeriod){
+        probabilities[t,1:3] <- multiProbGen(x=c(Alpha*t.step*TestCapacity[t], Gamma*t.step))
+     }
     for(region in 1:Regions){
       S[region,1] <- Pop[region] - (region == StartRegion)
       I[region,1] <- 0 + (region == StartRegion)
       for (t in 1:TimePeriod){
-        probabilities[region,t,1:3] <- multiProbGen(x=c(Alpha*t.step*TestCapacity[t], Gamma*t.step))
         newI[region,t] ~ dbinom(size = S[region,t],
                                 prob =  probGen(
                                   sum(Connectivity[region,1:Regions]*I[1:Regions,t]*Freq[1:Regions])*
@@ -48,9 +50,9 @@ COVIDModel <- function(newD,
                                     Lockdown[1]^((t>=ChangePoint[1] & t<ChangePoint[2])|(t>=ChangePoint[3] & t<ChangePoint[4]))*
                                     Lockdown[2]^((t>=ChangePoint[2] & t<ChangePoint[3])|t>=ChangePoint[4])*
                                     t.step))
-        oldIs[region,t,1:3] ~ dmulti(size = I[region,t], prob = probabilities[region,t,1:3])
+        oldIs[region,t,1:3] ~ dmulti(size = I[region,t], prob = probabilities[t,1:3])
         S[region,t+1] <- S[region,t] - newI[region,t]
-        I[region,t+1] <- newI[region,t] + oldIs[region,t,3]
+        I[region,t+1] <- I[region,t] + newI[region,t] - oldIs[region,t,1] - oldIs[region,t,2]
       }
     }
   })
