@@ -136,6 +136,8 @@ initialValues.COVIDUK <- function(epiModel, hyperParameters){
   newI[epiModel@Model$StartRegion,newI[epiModel@Model$StartRegion,]!=0][1] <- newI[epiModel@Model$StartRegion,newI[epiModel@Model$StartRegion,]!=0][1] - 1
   epiModel@Model$oldIs[,,2] <- newR
   epiModel@Model$newI <- newI
+  epiModel@Model$calculate("I")
+  epiModel@Model$oldIs[,,3] <- epiModel@Model$I - epiModel@Model$oldIs[,,1] - epiModel@Model$oldIs[,,2]
   return(
     epiModel
   )
