@@ -8,8 +8,8 @@
 #' @return a value on the range (0,1)
 #' @export
 probGen <- nimble::nimbleFunction(
-  run = function(x = double(1)) {
-    returnType(double(1))
+  run = function(x = double(0)) {
+    returnType(double(0))
     return(1 - exp(-x))
   }
 )
@@ -28,6 +28,6 @@ probGen <- nimble::nimbleFunction(
 multiProbGen <- nimbleFunction(run = function(x=double(1)){
   returnType(double(1))
   failValue <- sum(x)
-  x <- c(probGen(x),exp(-failValue))
+  x <- c(1-exp(-x),exp(-failValue))
   return(x/sum(x))
 })
