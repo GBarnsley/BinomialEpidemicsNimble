@@ -13,5 +13,13 @@ buildMCMCInternal <- function(epiModel, hyperParameters, showCompilerOutput){
       reset = function() {}
     )
   )
+  additiveSampler <- nimbleFunction(
+    contains = sampler_BASE,
+    setup = additiveSampler_setup,
+    run = additiveSampler_run,
+    methods = list(
+      reset = function() {}
+    )
+  )
   UseMethod("buildMCMCInternal")
 }
