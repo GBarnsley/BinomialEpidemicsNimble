@@ -47,7 +47,7 @@ additiveSampler_run <- function() {
          log(maxAmount)
       )
     
-    model[[target]][position] <<- model[[target]][position] + addSub*amount ###CARRYON FROM HERE
+    model[[target]][position] <<- model[[target]][position] + addSub*amount
     model_lp_proposed <- calculate(model, calcNodes)
     
     subPositionsNew <- which(model[[target]]!=0)
