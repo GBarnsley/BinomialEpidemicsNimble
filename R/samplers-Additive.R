@@ -25,7 +25,7 @@ additiveSampler_run <- function() {
     if(addSub == 1){
       #if adding choose any position
       pos <- rcat(n = 1, prob = rep(1/targetLength, targetLength))
-      position <- 1:targetLength[pos]
+      position <- c(1:targetLength)[pos]
       #determining maximum size
       maxAmount <- addSubMax
     }else{
