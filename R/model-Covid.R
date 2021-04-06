@@ -283,7 +283,7 @@ loadCOVIDAPIdate <- function(regionType, metricType){
     stop(err_msg)
   }
   json_text <- httr::content(response, "text")
-  output <- jsonlite::fromJSON(json_text)$data
+  output <- jsonlite::fromJSON(json_text)$body
   output$date <- lubridate::ymd(output$date)
   return(output)
 }
