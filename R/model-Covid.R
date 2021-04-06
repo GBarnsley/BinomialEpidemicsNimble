@@ -205,9 +205,9 @@ ImportCOVIDUKTimeSeries <- function(population,
   ##Loading Scotland and Wales
   NationRawCases <- loadCOVIDAPIdate("nation","newCasesBySpecimenDate")
   ##Combing Cases
-  RawCases <- rbind(EnglandRawCases, NationRawCases[NationRawCases$code %in% c("S92000003","W92000004"),])
+  RawCases <- rbind(EnglandRawCases, NationRawCases[NationRawCases$areaCode %in% c("S92000003","W92000004"),])
   ##storing region codes
-  regionCodes <- sort(unique(RawCases$code))
+  regionCodes <- sort(unique(RawCases$areaCode))
   ##storing Regions (the constant)
   Regions <- length(regionCodes)
   ##Storing max date in timeseries (used later in determining overall length), we subtract 7 because of delays in reporting
@@ -215,7 +215,7 @@ ImportCOVIDUKTimeSeries <- function(population,
   ##Sorting into matrix (newD)
   newD <- matrix(0,nrow = length(regionCodes), ncol = max(RawCases$date)-startDate)
   for(row in 1:nrow(RawCases)){
-    newD[which(RawCases$code[row] == regionCodes), RawCases$date[row] - startDate] <- RawCases$newCases[row]
+    newD[which(RawCases$areaCode[row] == regionCodes), RawCases$date[row] - startDate] <- RawCases$newCasesBySpecimenDate[row]
   }
   ###Setting Up Connectivity
   Connectivity <- matrix(NA, nrow = Regions, ncol = Regions)
@@ -243,8 +243,8 @@ ImportCOVIDUKTimeSeries <- function(population,
   ##Storing Maximum date
   TestMaxDate <- max(RawTestCapacity$date)
   #flipping to correct order and imputing capacity from start date to first set of date, just assume linear increase from 1
-  TestCapacity <- c(seq(1,RawTestCapacity$test[which.min(RawTestCapacity$date)],length.out=min(RawTestCapacity$date)-startDate),
-                    rev(RawTestCapacity$test))
+  TestCapacity <- c(seq(1,RawTestCapacity$plannedCapacityByPublishDate[which.min(RawTestCapacity$date)],length.out=min(RawTestCapacity$date)-startDate),
+                    rev(RawTestCapacity$plannedCapacityByPublishDate))
   #Converting to log format
   TestCapacity <- log(TestCapacity)
   ###Setting up ChangePoints
