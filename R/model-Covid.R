@@ -201,9 +201,9 @@ ImportCOVIDUKTimeSeries <- function(population,
                                     startDate = lubridate::dmy("20/01/20")){
   ###Loading Case Data
   ##Loading England Region Cases:
-  EnglandRawCases <- loadCOVIDAPIdate("region","newCasesBySpecimenDate","newCases")
+  EnglandRawCases <- loadCOVIDAPIdate("region","newCasesBySpecimenDate")
   ##Loading Scotland and Wales
-  NationRawCases <- loadCOVIDAPIdate("nation","newCasesBySpecimenDate","newCases")
+  NationRawCases <- loadCOVIDAPIdate("nation","newCasesBySpecimenDate")
   ##Combing Cases
   RawCases <- rbind(EnglandRawCases, NationRawCases[NationRawCases$code %in% c("S92000003","W92000004"),])
   ##storing region codes
@@ -239,7 +239,7 @@ ImportCOVIDUKTimeSeries <- function(population,
     pop[regionIndex] <- population$pop[population$code == regionCodes[regionIndex]]
   }
   ###Loading Test Capacity Data
-  RawTestCapacity <- loadCOVIDAPIdate("overview","plannedCapacityByPublishDate","test")
+  RawTestCapacity <- loadCOVIDAPIdate("overview","plannedCapacityByPublishDate")
   ##Storing Maximum date
   TestMaxDate <- max(RawTestCapacity$date)
   #flipping to correct order and imputing capacity from start date to first set of date, just assume linear increase from 1
