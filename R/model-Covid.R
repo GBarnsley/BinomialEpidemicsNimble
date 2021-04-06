@@ -159,10 +159,10 @@ buildMCMCInternal.COVIDUK <- function(epiModel, hyperParameters, showCompilerOut
                       type = sampler,
                       control = hyperParameters$`N+-Delta`
                       )
-    output$addSampler(target = paste0("newI[", i, ",]"),
-                      type = additiveSampler,
-                      control = hyperParameters$Additive
-                      ) 
+    #output$addSampler(target = paste0("newI[", i, ",]"),
+    #                  type = additiveSampler,
+    #                  control = hyperParameters$Additive
+    #                  ) 
   }
   output$addSampler(target = "Alpha",
                     type = "RW")
