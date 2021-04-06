@@ -273,11 +273,10 @@ ImportCOVIDUKTimeSeries <- function(population,
 #' @param outputName the name of the output in the return data frame.
 #' @return a data frame of the dates, codes and output
 #' @export
-loadCOVIDAPIdate <- function(regionType, output, outputName){
-  endpoint <- paste0('https://api.coronavirus.data.gov.uk/v1/data?filters=areaType=',
-    regionType,'&structure={"code":"areaCode","date":"date","',
-    outputName,'":"',
-    output,'"}')
+loadCOVIDAPIdate <- function(regionType, metricType){
+  endpoint <- paste0('https://api.coronavirus.data.gov.uk/v2/data?areaType=',
+    regionType,'&metric=',metricType,'&format=json'
+                    )
   httr::GET(url = endpoint, httr::timeout(10)) -> response
   if (response$status_code >= 400) {
     err_msg = httr::http_status(response)
